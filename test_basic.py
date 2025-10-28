@@ -150,6 +150,40 @@ def test_imports():
         print(f"❌ 模块导入检查失败: {e}")
         return False
 
+def test_model_path():
+    """测试模型路径"""
+    print("\n🤖 测试模型路径...")
+    
+    try:
+        from glm_config import ProjectConfig
+        pc = ProjectConfig()
+        
+        print(f"模型路径: {pc.pre_model}")
+        
+        # 检查模型路径是否存在
+        if not os.path.exists(pc.pre_model):
+            print(f"❌ 模型路径不存在: {pc.pre_model}")
+            print("💡 请确认:")
+            print("   1. 模型已下载到指定路径")
+            print("   2. 或修改 glm_config.py 中的 self.pre_model 路径")
+            print("   3. 或使用在线模型: 'THUDM/chatglm-6b'")
+            return False
+        
+        # 检查关键文件
+        required_files = ['config.json']
+        for file in required_files:
+            file_path = os.path.join(pc.pre_model, file)
+            if not os.path.exists(file_path):
+                print(f"❌ 缺少关键文件: {file}")
+                return False
+        
+        print("✅ 模型路径检查通过")
+        return True
+        
+    except Exception as e:
+        print(f"❌ 模型路径检查失败: {e}")
+        return False
+
 def main():
     """主测试函数"""
     print("🚀 ChatGLM-6B QLoRA 三元组抽取基础测试")
@@ -159,6 +193,7 @@ def main():
         ("环境检查", test_environment),
         ("配置检查", test_config),
         ("模块导入检查", test_imports),
+        ("模型路径检查", test_model_path),
         ("数据格式检查", test_data_format),
     ]
     

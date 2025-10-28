@@ -21,6 +21,15 @@ else
     echo "⚠️ nvidia-smi未找到，可能没有CUDA环境"
 fi
 
+# 检查模型路径
+echo ""
+echo "🔍 检查模型路径..."
+python check_model_path.py
+if [ $? -ne 0 ]; then
+    echo "❌ 模型路径检查失败，请检查模型配置"
+    exit 1
+fi
+
 # 运行基础测试
 echo ""
 echo "🧪 运行基础测试..."

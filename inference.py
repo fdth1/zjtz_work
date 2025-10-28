@@ -49,7 +49,10 @@ if __name__ == '__main__':
 
     device = 'cuda:0'
     max_new_tokens = 300
-    model_path = r"D:\01-大模型\大模型训练营--课件\大模型训练营--课件\第八章：新媒体行业评论智能分类与信息抽取系统\ptune_chatglm\checkpoints\ptune\model_best"
+    # 使用配置中的模型保存路径
+    from glm_config import ProjectConfig
+    pc = ProjectConfig()
+    model_path = os.path.join(pc.save_dir, "model_best")
 
     tokenizer = AutoTokenizer.from_pretrained(
         model_path,

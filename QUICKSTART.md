@@ -9,13 +9,19 @@
 
 ## ⚡ 快速开始
 
-### 1. 安装依赖
+### 1. 确认模型路径
+
+**重要**: 代码已配置为使用本地模型路径：`/root/.cache/modelscope/hub/models/ZhipuAI/ChatGLM-6B`
+
+如果您的模型在不同路径，请修改 `glm_config.py` 中的 `self.pre_model` 参数。
+
+### 2. 安装依赖
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. 一键启动训练
+### 3. 一键启动训练
 
 ```bash
 ./start_training.sh
@@ -31,7 +37,7 @@ python test_basic.py
 python train.py
 ```
 
-### 3. 监控训练
+### 4. 监控训练
 
 ```bash
 # 监控GPU使用情况
@@ -41,7 +47,7 @@ nvidia-smi -l 1
 tail -f training.log
 ```
 
-### 4. 推理测试
+### 5. 推理测试
 
 ```bash
 # 交互式推理
