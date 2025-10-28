@@ -17,6 +17,13 @@ def check_model_path():
     
     print(f"🔍 检查模型路径: {model_path}")
     
+    # 检查是否是在线模型
+    online_models = ['THUDM/chatglm-6b', 'THUDM/chatglm2-6b', 'ZhipuAI/ChatGLM-6B']
+    if model_path in online_models:
+        print(f"📡 使用在线模型: {model_path}")
+        print("✅ 在线模型配置正确，首次使用时会自动下载到缓存目录")
+        return True
+    
     if not os.path.exists(model_path):
         print(f"❌ 模型路径不存在: {model_path}")
         print("\n💡 解决方案:")
@@ -73,9 +80,19 @@ def check_disk_space():
     pc = ProjectConfig()
     model_path = pc.pre_model
     
+    # 如果是在线模型，检查缓存目录
+    online_models = ['THUDM/chatglm-6b', 'THUDM/chatglm2-6b', 'ZhipuAI/ChatGLM-6B']
+    if model_path in online_models:
+        # 检查Hugging Face缓存目录
+        cache_dir = os.path.expanduser("~/.cache/huggingface")
+        if not os.path.exists(cache_dir):
+            cache_dir = "/"  # 使用根目录作为备选
+    else:
+        cache_dir = os.path.dirname(model_path) if os.path.exists(os.path.dirname(model_path)) else "/"
+    
     try:
         import shutil
-        total, used, free = shutil.disk_usage(os.path.dirname(model_path))
+        total, used, free = shutil.disk_usage(cache_dir)
         
         print(f"\n💾 磁盘空间信息:")
         print(f"   - 总空间: {total // (1024**3):.1f} GB")
