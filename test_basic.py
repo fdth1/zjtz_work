@@ -160,22 +160,28 @@ def test_model_path():
         
         print(f"模型路径: {pc.pre_model}")
         
-        # 检查模型路径是否存在
-        if not os.path.exists(pc.pre_model):
-            print(f"❌ 模型路径不存在: {pc.pre_model}")
-            print("💡 请确认:")
-            print("   1. 模型已下载到指定路径")
-            print("   2. 或修改 glm_config.py 中的 self.pre_model 路径")
-            print("   3. 或使用在线模型: 'THUDM/chatglm-6b'")
-            return False
-        
-        # 检查关键文件
-        required_files = ['config.json']
-        for file in required_files:
-            file_path = os.path.join(pc.pre_model, file)
-            if not os.path.exists(file_path):
-                print(f"❌ 缺少关键文件: {file}")
+        # 检查是否是在线模型
+        online_models = ['THUDM/chatglm-6b', 'THUDM/chatglm2-6b', 'ZhipuAI/ChatGLM-6B']
+        if pc.pre_model in online_models:
+            print(f"📡 使用在线模型: {pc.pre_model}")
+            print("✅ 在线模型配置正确，首次使用时会自动下载")
+        else:
+            # 检查本地模型路径是否存在
+            if not os.path.exists(pc.pre_model):
+                print(f"❌ 模型路径不存在: {pc.pre_model}")
+                print("💡 请确认:")
+                print("   1. 模型已下载到指定路径")
+                print("   2. 或修改 glm_config.py 中的 self.pre_model 路径")
+                print("   3. 或使用在线模型: 'THUDM/chatglm-6b'")
                 return False
+            
+            # 检查关键文件
+            required_files = ['config.json']
+            for file in required_files:
+                file_path = os.path.join(pc.pre_model, file)
+                if not os.path.exists(file_path):
+                    print(f"❌ 缺少关键文件: {file}")
+                    return False
         
         print("✅ 模型路径检查通过")
         return True

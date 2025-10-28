@@ -8,7 +8,7 @@ class ProjectConfig(object):
         self.device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
         
         # 使用本地模型路径
-        self.pre_model = 'THUDM/chatglm-6b'  # 本地模型路径
+        self.pre_model = '/root/.cache/modelscope/hub/models/ZhipuAI/ChatGLM-6B'  # 本地模型路径
         self.train_path = os.path.join(os.path.dirname(__file__), 'data', 'mixed_train_dataset.jsonl')
         self.dev_path = os.path.join(os.path.dirname(__file__), 'data', 'mixed_dev_dataset.jsonl')
         
