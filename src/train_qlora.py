@@ -211,11 +211,11 @@ def main():
     
     args = parser.parse_args()
     
-    # 创建参数对象
-    model_args = ModelArguments(model_name_or_path=args.model_name_or_path)
+    # 创建参数对象，确保去除空白字符
+    model_args = ModelArguments(model_name_or_path=args.model_name_or_path.strip())
     data_args = DataArguments(
-        train_file=args.train_file,
-        validation_file=args.validation_file,
+        train_file=args.train_file.strip(),
+        validation_file=args.validation_file.strip(),
         max_source_length=args.max_source_length,
         max_target_length=args.max_target_length
     )
@@ -253,7 +253,7 @@ def main():
     
     # 训练参数
     training_args = TrainingArguments(
-        output_dir=args.output_dir,
+        output_dir=args.output_dir.strip(),
         overwrite_output_dir=True,
         num_train_epochs=args.num_train_epochs,
         per_device_train_batch_size=args.per_device_train_batch_size,
@@ -294,7 +294,7 @@ def main():
     # 保存模型
     logger.info("保存模型...")
     trainer.save_model()
-    tokenizer.save_pretrained(args.output_dir)
+    tokenizer.save_pretrained(args.output_dir.strip())
     
     logger.info("训练完成！")
 

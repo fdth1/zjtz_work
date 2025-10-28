@@ -22,9 +22,25 @@ LORA_ALPHA=32
 LORA_DROPOUT=0.1
 
 # 创建输出目录
-mkdir -p $OUTPUT_DIR
+mkdir -p "$OUTPUT_DIR"
 
 # 执行训练
-python src/train_qlora.py --model_name_or_path $MODEL_NAME --train_file $TRAIN_FILE --validation_file $VAL_FILE --output_dir $OUTPUT_DIR --num_train_epochs $NUM_EPOCHS --per_device_train_batch_size $BATCH_SIZE --per_device_eval_batch_size $BATCH_SIZE --gradient_accumulation_steps $GRAD_ACCUM --learning_rate $LEARNING_RATE --lora_r $LORA_R --lora_alpha $LORA_ALPHA --lora_dropout $LORA_DROPOUT --warmup_steps 100 --logging_steps 10 --save_steps 500 --eval_steps 500
+python src/train_qlora.py \
+    --model_name_or_path "$MODEL_NAME" \
+    --train_file "$TRAIN_FILE" \
+    --validation_file "$VAL_FILE" \
+    --output_dir "$OUTPUT_DIR" \
+    --num_train_epochs $NUM_EPOCHS \
+    --per_device_train_batch_size $BATCH_SIZE \
+    --per_device_eval_batch_size $BATCH_SIZE \
+    --gradient_accumulation_steps $GRAD_ACCUM \
+    --learning_rate $LEARNING_RATE \
+    --lora_r $LORA_R \
+    --lora_alpha $LORA_ALPHA \
+    --lora_dropout $LORA_DROPOUT \
+    --warmup_steps 100 \
+    --logging_steps 10 \
+    --save_steps 500 \
+    --eval_steps 500
 
 echo "训练完成！模型保存在: $OUTPUT_DIR"
