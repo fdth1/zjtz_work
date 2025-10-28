@@ -21,6 +21,33 @@ else
     echo "⚠️ nvidia-smi未找到，可能没有CUDA环境"
 fi
 
+# 检查模型路径
+echo ""
+echo "🔍 检查模型路径..."
+python check_model_path.py
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ 模型路径检查失败"
+    echo "💡 是否要运行模型路径配置助手? (y/N)"
+    read -r response
+    if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        python setup_model_path.py
+        if [ $? -ne 0 ]; then
+            echo "❌ 模型路径配置失败"
+            exit 1
+        fi
+        # 重新检查模型路径
+        python check_model_path.py
+        if [ $? -ne 0 ]; then
+            echo "❌ 模型路径仍然无效"
+            exit 1
+        fi
+    else
+        echo "❌ 请手动配置模型路径后重试"
+        exit 1
+    fi
+fi
+
 # 运行基础测试
 echo ""
 echo "🧪 运行基础测试..."

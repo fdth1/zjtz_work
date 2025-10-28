@@ -55,9 +55,23 @@ python test_training.py
 
 ## 🎯 使用方法
 
-### 1. 配置参数
+### 1. 配置模型路径
 
-编辑 `glm_config.py` 中的配置：
+**重要**: 代码已配置为使用本地模型路径：`/root/.cache/modelscope/hub/models/ZhipuAI/ChatGLM-6B`
+
+如果您的模型在不同路径，请修改 `glm_config.py` 中的 `self.pre_model` 参数：
+
+```python
+# 方式1: 使用本地路径（推荐，速度快）
+self.pre_model = '/root/.cache/modelscope/hub/models/ZhipuAI/ChatGLM-6B'
+
+# 方式2: 使用在线模型（需要网络下载）
+self.pre_model = 'THUDM/chatglm-6b'
+```
+
+### 2. 配置参数
+
+编辑 `glm_config.py` 中的其他配置：
 
 ```python
 class ProjectConfig(object):
