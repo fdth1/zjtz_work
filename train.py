@@ -15,6 +15,9 @@ from data_handle.data_loader import *
 from glm_config import *
 
 pc = ProjectConfig()
+# 选择用于autocast的设备类型（'cuda' 或 'cpu'），避免传入如 'cuda:0' 的无效值
+AMP_DEVICE_TYPE = 'cuda' if torch.cuda.is_available() and str(pc.device).startswith('cuda') else 'cpu'
+
 
 def print_gpu_memory():
     """打印GPU显存使用情况"""
@@ -42,7 +45,7 @@ def evaluate_model(model, dev_dataloader):
     with torch.no_grad():
         for batch in dev_dataloader:
             if pc.use_lora:
-                with autocast(device_type=pc.device):
+                with autocast(device_type=AMP_DEVICE_TYPE):
                     loss = model(
                         input_ids=batch['input_ids'].to(dtype=torch.long, device=pc.device),
                         labels=batch['labels'].to(dtype=torch.long, device=pc.device)
@@ -85,8 +88,14 @@ def model2train():
     )
 
     print("🔧 配置模型优化设置...")
-    # 启用梯度检查点以节省显存
-    model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+    # 启用梯度检查点以节省显存（兼容不同transformers版本）
+    try:
+        model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+    except TypeError:
+        try:
+            model.gradient_checkpointing_enable(use_reentrant=False)
+        except TypeError:
+            model.gradient_checkpointing_enable()
     model.enable_input_require_grads()
     # 禁用缓存以节省显存
     model.config.use_cache = False
@@ -185,7 +194,7 @@ def model2train():
         for step, batch in enumerate(train_dataloader):
             # 前向传播
             if pc.fp16 and scaler is not None:
-                with autocast(device_type=pc.device):
+                with autocast(device_type=AMP_DEVICE_TYPE):
                     loss = model(
                         input_ids=batch['input_ids'].to(dtype=torch.long, device=pc.device),
                         labels=batch['labels'].to(dtype=torch.long, device=pc.device)
