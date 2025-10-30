@@ -7,7 +7,8 @@ from functools import partial
 import torch
 import peft
 # autocast是PyTorch中一种混合精度的技术，可在保持数值精度的情况下提高训练速度和减少显存占用。
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp import autocast
+from torch.cuda.amp import GradScaler
 from transformers import AutoTokenizer, AutoConfig, AutoModel, get_scheduler, AutoModelForCausalLM
 from utils.common_utils import *
 from data_handle.data_loader import *
@@ -41,7 +42,7 @@ def evaluate_model(model, dev_dataloader):
     with torch.no_grad():
         for batch in dev_dataloader:
             if pc.use_lora:
-                with autocast():
+                with autocast(device_type=pc.device):
                     loss = model(
                         input_ids=batch['input_ids'].to(dtype=torch.long, device=pc.device),
                         labels=batch['labels'].to(dtype=torch.long, device=pc.device)
@@ -79,12 +80,13 @@ def model2train():
         config=config,
         trust_remote_code=True,
         torch_dtype=torch.float16 if pc.fp16 else torch.float32,
-        device_map="auto" if torch.cuda.is_available() else None
+        load_in_4bit = True,
+        device_map = "auto"
     )
 
     print("🔧 配置模型优化设置...")
     # 启用梯度检查点以节省显存
-    model.gradient_checkpointing_enable()
+    model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     model.enable_input_require_grads()
     # 禁用缓存以节省显存
     model.config.use_cache = False
@@ -183,7 +185,7 @@ def model2train():
         for step, batch in enumerate(train_dataloader):
             # 前向传播
             if pc.fp16 and scaler is not None:
-                with autocast():
+                with autocast(device_type=pc.device):
                     loss = model(
                         input_ids=batch['input_ids'].to(dtype=torch.long, device=pc.device),
                         labels=batch['labels'].to(dtype=torch.long, device=pc.device)
@@ -215,6 +217,7 @@ def model2train():
                 
                 lr_scheduler.step()
                 optimizer.zero_grad()
+                clear_gpu_cache()
                 global_step += 1
                 
                 # 记录日志
